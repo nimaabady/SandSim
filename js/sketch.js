@@ -1,47 +1,50 @@
 let rows, col;
 let grid;
-let widthOfSquare = 10;
+let widthOfSquare = 5;
+let color = 47.5
 
 function setup() {
   createCanvas(500,500)
+  colorMode(HSB, 360, 255, 255);
+
   rows = height / widthOfSquare;
   col = width / widthOfSquare;
   grid = make2DArray(col, rows);
-  for(let i = 0; i < col; i++){
-    for(let j = 0; j < rows; j++){
-      grid[i][j] = 0;
-    }
-  }
-  
 }
 
 function mouseDragged(){
-  if(mouseX <= width && mouseY <= height){
     let mX = floor(mouseX / widthOfSquare);
     let mY = floor(mouseY / widthOfSquare);
-    grid[mX][mY] = 1
-  }
+    grid[mX][mY] = color;
+    grid[mX+1][mY] = color;
+    grid[mX+2][mY] = color;
+    grid[mX][mY+1] = color;
+    grid[mX+1][mY+1] = color;
+    grid[mX+2][mY+1] = color;
+    grid[mX][mY+2] = color;
+    grid[mX+1][mY+2] = color;
+    grid[mX+2][mY+2] = color;
 
-  
 }
-
 
 function draw() {
   background(0)
   
-  for(let i = 0; i < col; i++){
-    for(let j = 0; j < rows; j++){
-        stroke(255);
-        fill(grid[i][j]*255);
-        let x = i * widthOfSquare;
-        let y = j * widthOfSquare;
-        square(x, y, widthOfSquare);
+  for (let i = 0; i < col; i++) {
+    for (let j = 0; j < rows; j++) {
+      noStroke();
+      if (grid[i][j] > 0) {
+        fill(grid[i][j], 255, 255); // Use hue from grid
+      } else {
+        fill(0); // Black background
+      }
+      let x = i * widthOfSquare;
+      let y = j * widthOfSquare;
+      square(x, y, widthOfSquare);
     }
   }
 
-    if(frameCount % 2 == 0){
       frameStep();
-    }
   }
 
 
@@ -50,36 +53,34 @@ function make2DArray(cols, rows){
   let arr = new Array(cols)
   for(let i = 0; i < arr.length; i++){
     arr[i] = new Array(rows);
+    for(let j = 0; j < arr[i].length; j++){
+      arr[i][j] = 0
+    }
   }
-
   return arr;
 }
 
 function frameStep(){
-  
-  let next = grid;
+  let next = make2DArray(col, rows);
   for(let i = 0; i < col; i++){
     //rows -2 is so that it checks dosent check out of bound or bottom index
-    for(let j = rows - 2; j >= 0; j--){
-      let IsSand = next[i][j];
-      if(IsSand == 1 && next[i][j + 1] == 0){
-        below = next[i][j + 1] 
-
-        //TODO: this is hanging the app when touching the
-        //far right wall cause its trying to check an out of bounds index
-
-        belowDrift = next[i + 1][j + 1];
-
-        if(below == 0){
-          next[i][j] = 0
-          next[i][j + 1] = 1
-        } else if(next[i + 1][j + 1] != 1){
-          next[i + 1][j + 1] = 1
+    for(let j = 0; j < rows; j++ ){
+      let state = grid[i][j];
+      if(state === color ){
+        let below = (j < rows - 1) ? grid[i][j + 1] : 1;
+        let belowR = (i < col - 1 && j < rows - 1) ? grid[i + 1][j + 1] : 1;
+        let belowL = (i > 0 && j < rows - 1) ? grid[i - 1][j + 1] : 1;
+        
+        if (below === 0) {
+          next[i][j + 1] = state;
+        } else if (belowR === 0) {
+          next[i + 1][j + 1] = state;
+        } else if (belowL === 0) {
+          next[i - 1][j + 1] = state;
         } else {
-          next[i + dir][j + 1] = 1;
+          next[i][j] = state;
         }
       }
-      
     }
   }
   grid = next
@@ -92,3 +93,4 @@ function sleep(ms) {
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
+
