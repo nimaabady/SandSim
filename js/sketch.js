@@ -29,14 +29,13 @@ function mouseDragged(){
 
 function draw() {
   background(0)
-  
   for (let i = 0; i < col; i++) {
     for (let j = 0; j < rows; j++) {
       noStroke();
       if (grid[i][j] > 0) {
-        fill(grid[i][j], 255, 255); // Use hue from grid
+        fill(grid[i][j], 255, 255); 
       } else {
-        fill(0); // Black background
+        fill(0); 
       }
       let x = i * widthOfSquare;
       let y = j * widthOfSquare;
@@ -47,8 +46,7 @@ function draw() {
       frameStep();
   }
 
-
-
+//instantiate original array
 function make2DArray(cols, rows){
   let arr = new Array(cols)
   for(let i = 0; i < arr.length; i++){
@@ -63,7 +61,6 @@ function make2DArray(cols, rows){
 function frameStep(){
   let next = make2DArray(col, rows);
   for(let i = 0; i < col; i++){
-    //rows -2 is so that it checks dosent check out of bound or bottom index
     for(let j = 0; j < rows; j++ ){
       let state = grid[i][j];
       if(state === color ){
